@@ -40,6 +40,21 @@ body {
 
         .button {
             border-radius: 50px;
+            transition: background-color .15s ease-in-out;
+            cursor: default;
+            user-select: none;
+        }
+
+        .sym:hover {
+            background-color: rgb(219 217 220);
+        }
+
+        .operator:hover {
+            background-color: rgb(255 200 142);
+        }
+
+        .number:hover {
+            background-color: rgb(129 127 129);
         }
 
         .button:not(.digit-zero) {
