@@ -27,7 +27,8 @@ body {
             justify-content: end;
             align-items: end;
             padding-right: 22px;
-            font-size: 100px;
+            padding-left: auto;
+            font-size: 7.5vw;
         }
 
         .grid-col-span-4 {
