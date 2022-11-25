@@ -33,34 +33,52 @@ function operate (operator, num1, num2) {
     }
 }
 
-const decBtn = document.querySelector('.decimal');
-const clearBtn = document.querySelector('.clear');
-clearBtn.addEventListener('click', () => {
-    document.querySelector('.output').textContent = 0;
+// add decimal event listener; can only be clicked once
+function addDecimalListener() {
+    const decBtn = document.querySelector('.decimal');
     decBtn.addEventListener('click', e => {
         document.querySelector('.output').textContent += e.target.textContent;
         console.log(e); 
     }, {once: true});
 
+    // removes click event
     decBtn.addEventListener('click', function cb(e) {
         e.currentTarget.removeEventListener(e.type, cb);
     });
-});
-    
-decBtn.addEventListener('click', e => {
-    document.querySelector('.output').textContent += e.target.textContent;
-    console.log(e); 
-}, {once: true});
+}
 
-// removes click event
-decBtn.addEventListener('click', function cb(e) {
-    e.currentTarget.removeEventListener(e.type, cb);
-});
+// inserts comma for every third character
+function insertComma(outText) {
+    if (!outText.includes('.')) {
+        outText = outText.replace(/,/g, '');
+        if (outText.length > 3 && outText.length <= 6) {
+            outText = outText.slice(0, outText.length - 3) +
+                ',' +
+                outText.slice(outText.length - 3);
+        } else if (outText.length > 6) {
+            outText = outText.slice(0, outText.length - 6) +
+                ',' +
+                outText.slice(outText.length - 6, outText.length - 3) +
+                ',' +
+                outText.slice(outText.length - 3);
+        }
+    }
+    return outText;
+}
 
+const output = document.querySelector('.output');
+const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
+
+clearBtn.addEventListener('click', () => {
+    document.querySelector('.output').textContent = 0;
+    addDecimalListener();
+});
+
+addDecimalListener();
+
 numBtns.forEach(btn => {
     btn.addEventListener('click', e => {
-        const output = document.querySelector('.output');
         const numText = e.target.textContent;
         let outText = output.textContent;
 
@@ -70,22 +88,7 @@ numBtns.forEach(btn => {
             outText += numText;
         }
 
-        // inserts comma for every third character
-        if (!outText.includes('.')) {
-            outText = outText.replace(/,/g, '');
-            if (outText.length > 3 && outText.length <= 6) {
-                outText = outText.slice(0, outText.length-3) + 
-                    ',' + 
-                    outText.slice(outText.length-3);
-            } else if (outText.length > 6) {
-                outText = outText.slice(0, outText.length-6) + 
-                    ',' + 
-                    outText.slice(outText.length-6, outText.length-3) + 
-                    ',' +
-                    outText.slice(outText.length-3);
-            }
-        }
-        
-        output.textContent = outText;
+        output.textContent = insertComma(outText);
     })
 });
+
