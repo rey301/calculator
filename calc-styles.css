@@ -54,7 +54,7 @@ body {
             background-color: rgb(255 200 142);
         }
 
-        .number:hover {
+        .number:hover, .decimal:hover {
             background-color: rgb(129 127 129);
         }
 
@@ -74,7 +74,7 @@ body {
             padding-bottom: 5px;
         }
 
-        .number {
+        .number, .decimal {
             background-color: rgb(49 49 49);
         }
 
