@@ -35,16 +35,21 @@ function operate (operator, num1, num2) {
 
 // add decimal event listener; can only be clicked once
 function addDecimalListener() {
-    const decBtn = document.querySelector('.decimal');
-    decBtn.addEventListener('click', e => {
-        document.querySelector('.output').textContent += e.target.textContent;
-        console.log(e); 
+    const oldBtn = document.querySelector('.decimal');
+    const newBtn = oldBtn.cloneNode(true);
+
+    newBtn.addEventListener('click', e => {
+        if (output.textContent.replace(/,|\./g, '').length < 9) {
+            output.textContent += e.target.textContent;
+        }
     }, {once: true});
 
     // removes click event
-    decBtn.addEventListener('click', function cb(e) {
+    newBtn.addEventListener('click', function cb(e) {
         e.currentTarget.removeEventListener(e.type, cb);
     });
+
+    oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 }
 
 // inserts comma for every third character
@@ -70,12 +75,12 @@ const output = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
 
+addDecimalListener();
+
 clearBtn.addEventListener('click', () => {
     document.querySelector('.output').textContent = 0;
     addDecimalListener();
 });
-
-addDecimalListener();
 
 numBtns.forEach(btn => {
     btn.addEventListener('click', e => {
