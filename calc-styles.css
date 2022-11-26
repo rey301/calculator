@@ -9,7 +9,6 @@ body {
 /* Content */
 .content {
     display: flex;
-    flex-direction; column;
     justify-content: center;
 }
     .calculator {
@@ -43,17 +42,28 @@ body {
 
         .button {
             border-radius: 50px;
-            transition: background-color .15s ease-in-out;
+            transition: background-color .2s ease-in-out, color .2s ease-in-out;
             cursor: default;
             user-select: none;
         }
 
-        .sym:hover {
-            background-color: rgb(219 217 220);
+        /* Operator styles */
+        .operator {
+            background-color: rgb(246 153 8);
+            padding-bottom: 5px;
         }
 
-        .operator:hover {
+        .operatorClick {
+            background-color: white;
+            color: rgb(246 153 8);
+        } 
+
+        .operatorHover {
             background-color: rgb(255 200 142);
+        }
+
+        .sym:hover {
+            background-color: rgb(219 217 220);
         }
 
         .number:hover, .decimal:hover {
@@ -69,11 +79,6 @@ body {
         .sym {
             background-color: rgb(159 159 159);
             color: black;
-        }
-
-        .operator {
-            background-color: rgb(246 153 8);
-            padding-bottom: 5px;
         }
 
         .number, .decimal {

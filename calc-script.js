@@ -33,21 +33,18 @@ function operate (operator, num1, num2) {
     }
 }
 
-// add decimal event listener; can only be clicked once
-function addDecimalListener() {
+// remove and add decimal event listener; can only be clicked once
+function replaceDecimalListener() {
     const oldBtn = document.querySelector('.decimal');
     const newBtn = oldBtn.cloneNode(true);
 
-    newBtn.addEventListener('click', e => {
-        if (output.textContent.replace(/,|\./g, '').length < 9) {
-            output.textContent += e.target.textContent;
-        }
-    }, {once: true});
-
-    // removes click event
     newBtn.addEventListener('click', function cb(e) {
+        if (output.textContent.replace(/,|\./g, '').length < 9) {
+            output.te
+            xtContent += e.target.textContent;
+        }
         e.currentTarget.removeEventListener(e.type, cb);
-    });
+    }, {once: true});
 
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 }
@@ -71,15 +68,32 @@ function insertComma(outText) {
     return outText;
 }
 
+// event listener methods
+function addOpHover(e) {
+    return e.currentTarget.classList.add('operatorHover');
+}
+
+function removeOpHover(e) {
+    return e.currentTarget.classList.remove('operatorHover');
+}
+
+function clickOperator(e) {
+    e.currentTarget.removeEventListener('mouseover', addOpHover);
+    e.currentTarget.removeEventListener('mouseleave', removeOpHover);
+    e.currentTarget.classList.remove('operatorHover');
+    e.currentTarget.classList.add('operatorClick');
+}
+
 const output = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
+const opBtns = document.querySelectorAll('.operator');
 
-addDecimalListener();
+replaceDecimalListener();
 
 clearBtn.addEventListener('click', () => {
     document.querySelector('.output').textContent = 0;
-    addDecimalListener();
+    replaceDecimalListener();
 });
 
 numBtns.forEach(btn => {
@@ -97,3 +111,8 @@ numBtns.forEach(btn => {
     })
 });
 
+opBtns.forEach(opBtn => { 
+    opBtn.addEventListener('mouseover', addOpHover);
+    opBtn.addEventListener('mouseleave', removeOpHover);
+    opBtn.addEventListener('click', clickOperator);
+});
