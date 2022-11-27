@@ -4,6 +4,7 @@ body {
         Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', 
         sans-serif;
     font-size: 45px;
+    margin: 0;
 }
 
 /* Content */
@@ -47,7 +48,7 @@ body {
             user-select: none;
         }
 
-        /* Operator styles */
+        /* Operator */
         .operator {
             background-color: rgb(246 153 8);
             padding-bottom: 5px;
@@ -62,6 +63,12 @@ body {
             background-color: rgb(255 200 142);
         }
 
+        /* Symbol */
+        .sym {
+            background-color: rgb(159 159 159);
+            color: black;
+        }
+
         .sym:hover {
             background-color: rgb(219 217 220);
         }
@@ -74,11 +81,6 @@ body {
             display: flex; 
             align-items: center;
             justify-content: center;
-        }
-
-        .sym {
-            background-color: rgb(159 159 159);
-            color: black;
         }
 
         .number, .decimal {

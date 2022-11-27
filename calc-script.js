@@ -22,10 +22,10 @@ function operate (operator, num1, num2) {
         case '–':
             return subtract(num1, num2);
 
-        case '&times':
+        case '×':
             return multiply(num1, num2);
 
-        case '&divide':
+        case '÷':
             return divide(num1, num2);
 
         default: 
@@ -77,42 +77,89 @@ function removeOpHover(e) {
     return e.currentTarget.classList.remove('operatorHover');
 }
 
-function clickOperator(e) {
-    e.currentTarget.removeEventListener('mouseover', addOpHover);
-    e.currentTarget.removeEventListener('mouseleave', removeOpHover);
-    e.currentTarget.classList.remove('operatorHover');
-    e.currentTarget.classList.add('operatorClick');
+// operator click function
+function opClick(e) {
+    const operator = e.currentTarget.textContent;
+    
+    // styles
+    if (operator !== '=') {
+        opBtns.forEach(opBtn => {
+            if (operator !== opBtn.textContent) {
+                if (opBtn.classList.contains('operatorClick')) {
+                    opBtn.classList.remove('operatorClick');
+                }
+            }
+        });
+        e.currentTarget.classList.add('operatorClick');
+    }   
+
+    // operations
+    if (operator === '=') {
+        if (prevOperator !== '') {
+            currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+            accumulator = operate(prevOperator, prevVal, currVal);
+            output.textContent = accumulator;
+        }
+    } else {
+        prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
+        prevOperator = operator;
+        output.textContent = '0';
+    }
+}
+
+// number click function
+function numClick(e) {
+    const numText = e.target.textContent;
+    let outText = output.textContent;
+
+    if (outText === '0') {
+        output.textContent = numText; 
+    } else if (outText.replace(/,|\./g, '').length < 9) {
+        outText += numText;
+        output.textContent = insertComma(outText);
+    }
+
+    let clickedOp;
+
+    if (prevOperator === '+') {
+        clickedOp = document.querySelector('.add');
+        clickedOp.classList.remove('operatorClick');
+    } else if (prevOperator === '–'){
+        clickedOp = document.querySelector('.subtract');
+        clickedOp.classList.remove('operatorClick');
+    } else if (prevOperator === '×'){
+        clickedOp = document.querySelector('.multiply');
+        clickedOp.classList.remove('operatorClick');
+    } else if (prevOperator === '÷'){
+        clickedOp = document.querySelector('.divide');
+        clickedOp.classList.remove('operatorClick');
+    }
 }
 
 const output = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
+let prevVal = 0; 
+let prevOperator = 'default';
+let accumulator = 0;
 
 replaceDecimalListener();
 
+// clear button event listener
 clearBtn.addEventListener('click', () => {
     document.querySelector('.output').textContent = 0;
     replaceDecimalListener();
 });
 
-numBtns.forEach(btn => {
-    btn.addEventListener('click', e => {
-        const numText = e.target.textContent;
-        let outText = output.textContent;
-
-        if (outText === '0') {
-            return output.textContent = numText; 
-        } else if (outText.replace(/,|\./g, '').length < 9) {
-            outText += numText;
-        }
-
-        output.textContent = insertComma(outText);
-    })
+// number event listeners
+numBtns.forEach(numBtn => {
+    numBtn.addEventListener('click', numClick);
 });
 
+// operator event listeners
 opBtns.forEach(opBtn => { 
     opBtn.addEventListener('mouseover', addOpHover);
     opBtn.addEventListener('mouseleave', removeOpHover);
-    opBtn.addEventListener('click', clickOperator);
+    opBtn.addEventListener('click', opClick);
 });
