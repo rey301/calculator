@@ -33,7 +33,7 @@ function operate (operator, num1, num2) {
     }
 }
 
-// remove and add decimal event listener; can only be clicked once
+// replace decimal event listener; so that it can only be clicked once
 function replaceDecimalListener() {
     const oldBtn = document.querySelector('.decimal');
     const newBtn = oldBtn.cloneNode(true);
@@ -67,11 +67,11 @@ function insertComma(outText) {
     return outText;
 }
 
-// event listener methods
+// add style class for hovering over operator buttons
 function addOpHover(e) {
     return e.currentTarget.classList.add('operatorHover');
 }
-
+// remove style class for hovering over operator buttons
 function removeOpHover(e) {
     return e.currentTarget.classList.remove('operatorHover');
 }
@@ -80,7 +80,7 @@ function removeOpHover(e) {
 function opClick(e) {
     const operator = e.currentTarget.textContent;
     
-    // styles
+    // remove any other operatorClick class styles and apply it to the current
     if (operator !== '=') {
         opBtns.forEach(opBtn => {
             if (operator !== opBtn.textContent) {
@@ -111,6 +111,8 @@ function numClick(e) {
     const numText = e.target.textContent;
     let outText = output.textContent;
 
+    // if the output text is 0 or an operator has been clicked, 
+    // then replace the output, otherwise append to it
     if (outText === '0' || hasClickedOp) {
         hasClickedOp = false;
         output.textContent = numText; 
@@ -121,19 +123,28 @@ function numClick(e) {
 
     let clickedOp;
 
-    if (prevOperator === '+') {
-        clickedOp = document.querySelector('.add');
-        clickedOp.classList.remove('operatorClick');
-    } else if (prevOperator === '–'){
-        clickedOp = document.querySelector('.subtract');
-        clickedOp.classList.remove('operatorClick');
-    } else if (prevOperator === '×'){
-        clickedOp = document.querySelector('.multiply');
-        clickedOp.classList.remove('operatorClick');
-    } else if (prevOperator === '÷'){
-        clickedOp = document.querySelector('.divide');
+    // remove operatorClick style class (after a number is clicked)
+    if (prevOperator !== '' && prevOperator !== '=') {
+        if(prevOperator === '+'){
+            clickedOp = document.querySelector('.add');
+        } else if(prevOperator === '–'){
+            clickedOp = document.querySelector('.subtract');
+        } else if(prevOperator === '×'){
+            clickedOp = document.querySelector('.multiply');
+        } else if(prevOperator === '÷'){
+            clickedOp = document.querySelector('.divide');
+        }
         clickedOp.classList.remove('operatorClick');
     }
+}
+
+// reset calculator
+function allClear() {
+    document.querySelector('.output').textContent = 0;
+    replaceDecimalListener();
+    prevOperator = '';
+    accumulator = 0;
+    hasClickedOp = false;
 }
 
 const output = document.querySelector('.output');
@@ -141,17 +152,14 @@ const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
 let prevVal = 0; 
-let prevOperator = 'default';
+let prevOperator = '';
 let accumulator = 0;
 let hasClickedOp = false;
 
 replaceDecimalListener();
 
 // clear button event listener
-clearBtn.addEventListener('click', () => {
-    document.querySelector('.output').textContent = 0;
-    replaceDecimalListener();
-});
+clearBtn.addEventListener('click', allClear);
 
 // number event listeners
 numBtns.forEach(numBtn => {
