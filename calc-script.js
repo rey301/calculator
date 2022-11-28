@@ -29,7 +29,7 @@ function operate (operator, num1, num2) {
             return divide(num1, num2);
 
         default: 
-            return "Error: invalid arguments";
+            return "Error: invalid operator";
     }
 }
 
@@ -40,8 +40,7 @@ function replaceDecimalListener() {
 
     newBtn.addEventListener('click', function cb(e) {
         if (output.textContent.replace(/,|\./g, '').length < 9) {
-            output.te
-            xtContent += e.target.textContent;
+            output.textContent += e.target.textContent;
         }
         e.currentTarget.removeEventListener(e.type, cb);
     }, {once: true});
@@ -98,12 +97,12 @@ function opClick(e) {
         if (prevOperator !== '') {
             currVal = parseInt(output.textContent.replace(/,|\./g, ''));
             accumulator = operate(prevOperator, prevVal, currVal);
-            output.textContent = accumulator;
+            output.textContent = insertComma(accumulator.toString());
         }
     } else {
         prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
         prevOperator = operator;
-        output.textContent = '0';
+        hasClickedOp = true;
     }
 }
 
@@ -112,7 +111,8 @@ function numClick(e) {
     const numText = e.target.textContent;
     let outText = output.textContent;
 
-    if (outText === '0') {
+    if (outText === '0' || hasClickedOp) {
+        hasClickedOp = false;
         output.textContent = numText; 
     } else if (outText.replace(/,|\./g, '').length < 9) {
         outText += numText;
@@ -143,6 +143,7 @@ const opBtns = document.querySelectorAll('.operator');
 let prevVal = 0; 
 let prevOperator = 'default';
 let accumulator = 0;
+let hasClickedOp = false;
 
 replaceDecimalListener();
 
