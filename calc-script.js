@@ -79,7 +79,8 @@ function removeOpHover(e) {
 // operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
-    
+    hasClickedOp = true;
+
     // remove any other operatorClick class styles and apply it to the current
     if (operator !== '=') {
         opBtns.forEach(opBtn => {
@@ -93,16 +94,30 @@ function opClick(e) {
     }   
 
     // operations
-    if (operator === '=') {
-        if (prevOperator !== '') {
-            currVal = parseInt(output.textContent.replace(/,|\./g, ''));
-            accumulator = operate(prevOperator, prevVal, currVal);
-            output.textContent = insertComma(accumulator.toString());
+    if (prevOperator !== '') {
+        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+        accumulator = operate(prevOperator, prevVal, currVal);
+        output.textContent = insertComma(accumulator.toString());
+    }
+
+    prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
+    prevOperator = operator;
+}
+
+function removePrevOpStyle() {
+    // remove operatorClick style class (after a number is clicked)
+    let clickedOp;
+    if (prevOperator !== '' && prevOperator !== '=') {
+        if(prevOperator === '+'){
+            clickedOp = document.querySelector('.add');
+        } else if(prevOperator === '–'){
+            clickedOp = document.querySelector('.subtract');
+        } else if(prevOperator === '×'){
+            clickedOp = document.querySelector('.multiply');
+        } else if(prevOperator === '÷'){
+            clickedOp = document.querySelector('.divide');
         }
-    } else {
-        prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
-        prevOperator = operator;
-        hasClickedOp = true;
+        clickedOp.classList.remove('operatorClick');
     }
 }
 
@@ -121,27 +136,14 @@ function numClick(e) {
         output.textContent = insertComma(outText);
     }
 
-    let clickedOp;
-
-    // remove operatorClick style class (after a number is clicked)
-    if (prevOperator !== '' && prevOperator !== '=') {
-        if(prevOperator === '+'){
-            clickedOp = document.querySelector('.add');
-        } else if(prevOperator === '–'){
-            clickedOp = document.querySelector('.subtract');
-        } else if(prevOperator === '×'){
-            clickedOp = document.querySelector('.multiply');
-        } else if(prevOperator === '÷'){
-            clickedOp = document.querySelector('.divide');
-        }
-        clickedOp.classList.remove('operatorClick');
-    }
+    removePrevOpStyle();
 }
 
 // reset calculator
 function allClear() {
     document.querySelector('.output').textContent = 0;
     replaceDecimalListener();
+    removePrevOpStyle();
     prevOperator = '';
     accumulator = 0;
     hasClickedOp = false;
