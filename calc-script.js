@@ -79,32 +79,38 @@ function removeOpHover(e) {
 // operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
+    let currVal = 0;
     hasClickedOp = true; 
+
+    // remove any other operatorClick class styles
+    opBtns.forEach(opBtn => {
+        if (operator !== opBtn.textContent) {
+            if (opBtn.classList.contains('operatorClick')) {
+                opBtn.classList.remove('operatorClick');
+            }
+        }
+    });
 
     // only calculate accumulator if there is a previous operator, 
     // and if the operator is not equals
     if (prevOperator !== '') {
         // calculate and add to accumulator
-        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+        if (hasClickedNum) {
+            currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+        }
         accumulator = operate(prevOperator, prevVal, currVal);
         output.textContent = insertComma(accumulator.toString());
     }
 
     if (operator !== '=') {
-        // remove any other operatorClick class styles
-        opBtns.forEach(opBtn => {
-            if (operator !== opBtn.textContent) {
-                if (opBtn.classList.contains('operatorClick')) {
-                    opBtn.classList.remove('operatorClick');
-                }
-            }
-        });
         e.currentTarget.classList.add('operatorClick'); // add click style
         prevOperator = operator;
+        prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
     } else if (operator === '=') {
         prevOperator = '';
     }
-    prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
+
+    hasClickedNum = false;
 }
 
 // remove operatorClick style class (after a number is clicked)
@@ -128,6 +134,7 @@ function removePrevOpStyle() {
 function numClick(e) {
     const numText = e.target.textContent;
     let outText = output.textContent;
+    hasClickedNum = true;
 
     // if the output text is 0 or an operator has been clicked, 
     // then replace the output, otherwise append to it
@@ -160,6 +167,7 @@ let prevVal = 0;
 let prevOperator = '';
 let accumulator = 0;
 let hasClickedOp = false;
+let hasClickedNum = false;
 
 replaceDecimalListener();
 
