@@ -79,10 +79,19 @@ function removeOpHover(e) {
 // operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
-    hasClickedOp = true;
+    hasClickedOp = true; 
 
-    // remove any other operatorClick class styles and apply it to the current
+    // only calculate accumulator if there is a previous operator, 
+    // and if the operator is not equals
+    if (prevOperator !== '') {
+        // calculate and add to accumulator
+        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+        accumulator = operate(prevOperator, prevVal, currVal);
+        output.textContent = insertComma(accumulator.toString());
+    }
+
     if (operator !== '=') {
+        // remove any other operatorClick class styles
         opBtns.forEach(opBtn => {
             if (operator !== opBtn.textContent) {
                 if (opBtn.classList.contains('operatorClick')) {
@@ -90,22 +99,16 @@ function opClick(e) {
                 }
             }
         });
-        e.currentTarget.classList.add('operatorClick');
-    }   
-
-    // operations
-    if (prevOperator !== '') {
-        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
-        accumulator = operate(prevOperator, prevVal, currVal);
-        output.textContent = insertComma(accumulator.toString());
+        e.currentTarget.classList.add('operatorClick'); // add click style
+        prevOperator = operator;
+    } else if (operator === '=') {
+        prevOperator = '';
     }
-
     prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
-    prevOperator = operator;
 }
 
+// remove operatorClick style class (after a number is clicked)
 function removePrevOpStyle() {
-    // remove operatorClick style class (after a number is clicked)
     let clickedOp;
     if (prevOperator !== '' && prevOperator !== '=') {
         if(prevOperator === '+'){
