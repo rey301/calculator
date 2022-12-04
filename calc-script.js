@@ -95,11 +95,13 @@ function opClick(e) {
     // and if the operator is not equals
     if (prevOperator !== '') {
         // calculate and add to accumulator
+        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
         if (hasClickedNum) {
-            currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+            accumulator = operate(prevOperator, prevVal, currVal);
+            output.textContent = insertComma(accumulator.toString());
+        } else {
+            output.textContent = insertComma(currVal.toString());
         }
-        accumulator = operate(prevOperator, prevVal, currVal);
-        output.textContent = insertComma(accumulator.toString());
     }
 
     if (operator !== '=') {
