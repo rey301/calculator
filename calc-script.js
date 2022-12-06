@@ -80,7 +80,7 @@ function removeOpHover(e) {
 // operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
-    let currVal = parseInt(output.textContent.replace(/,|\./g, ''));
+    let currVal = parseFloat(output.textContent.replace(/,/g, ''));
 
     console.log(`currVal = ${currVal}`);
 
