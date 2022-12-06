@@ -93,7 +93,12 @@ function opClick(e) {
             accumulator = operate(prevOperator, prevVal, currVal);
         }
 
-        output.textContent = insertComma(accumulator.toString());
+        if (accumulator.toString().length > 10) {
+            output.textContent = insertComma(roundNumber(accumulator, 8)
+                .toString());
+        } else {
+            output.textContent = insertComma(accumulator.toString());
+        }
     } 
 
     console.log(`accumulator = ${accumulator}`);
@@ -165,6 +170,12 @@ function allClear() {
     accumulator = null;
     hasClickedOp = false;
     hasClickedNum = false;
+}
+
+function roundNumber(number, digits) {
+    var multiple = Math.pow(10, digits);
+    var rndedNum = Math.round(number * multiple) / multiple;
+    return rndedNum;
 }
 
 const output = document.querySelector('.output');
