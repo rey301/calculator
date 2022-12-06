@@ -39,7 +39,11 @@ function replaceDecimalListener() {
     const newBtn = oldBtn.cloneNode(true);
 
     newBtn.addEventListener('click', function cb(e) {
-        if (output.textContent.replace(/,|\./g, '').length < 9) {
+        if (hasClickedOp || hasClickedEquals) {
+            hasClickedOp = false;
+            hasClickedEquals = true;
+            output.textContent = '0.'; 
+        } else if (output.textContent.replace(/,|\./g, '').length < 9) {
             output.textContent += e.target.textContent;
         }
         e.currentTarget.removeEventListener(e.type, cb);
@@ -79,6 +83,7 @@ function removeOpHover(e) {
 
 // operator click function
 function opClick(e) {
+    replaceDecimalListener();
     const operator = e.currentTarget.textContent;
     let currVal = parseFloat(output.textContent.replace(/,/g, ''));
 
@@ -99,7 +104,7 @@ function opClick(e) {
         } else {
             output.textContent = insertComma(accumulator.toString());
         }
-    } 
+    }
 
     console.log(`accumulator = ${accumulator}`);
 
@@ -119,7 +124,9 @@ function opClick(e) {
         e.currentTarget.classList.add('operatorClick'); // add click style
         prevOperator = operator;
         hasClickedOp = true; 
-    } 
+    } else {
+        hasClickedEquals = true;
+    }
     
     hasClickedNum = false; // after clicking an operator 
 }
@@ -187,6 +194,7 @@ let prevOperator = '';
 let accumulator = null;
 let hasClickedOp = false;
 let hasClickedNum = false;
+let hasClickedEquals = false;
 
 replaceDecimalListener();
 
