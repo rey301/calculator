@@ -52,11 +52,12 @@ function replaceDecimalListener() {
 function insertComma(outText) {
     if (!outText.includes('.')) {
         outText = outText.replace(/,/g, '');
-        if (outText.length > 3 && outText.length <= 6) {
-            outText = outText.slice(0, outText.length - 3) +
-                ',' +
-                outText.slice(outText.length - 3);
-        } else if (outText.length > 6) {
+        if (outText.replace(/-/g, '').length > 3 && 
+            outText.replace(/-/g, '').length <= 6) {
+                outText = outText.slice(0, outText.length - 3) +
+                    ',' +
+                    outText.slice(outText.length - 3);
+        } else if (outText.replace(/-/g, '').length > 6) {
             outText = outText.slice(0, outText.length - 6) +
                 ',' +
                 outText.slice(outText.length - 6, outText.length - 3) +
@@ -79,40 +80,43 @@ function removeOpHover(e) {
 // operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
-    let currVal = 0;
-    hasClickedOp = true; 
+    let currVal = parseInt(output.textContent.replace(/,|\./g, ''));
 
-    // remove any other operatorClick class styles
-    opBtns.forEach(opBtn => {
-        if (operator !== opBtn.textContent) {
-            if (opBtn.classList.contains('operatorClick')) {
-                opBtn.classList.remove('operatorClick');
-            }
-        }
-    });
+    console.log(`currVal = ${currVal}`);
 
-    // only calculate accumulator if there is a previous operator, 
-    // and if the operator is not equals
-    if (prevOperator !== '') {
+    // only calculate if there is a previous operator 
+    if ((hasClickedNum || operator === '=') && prevOperator !== '') {
         // calculate and add to accumulator
-        currVal = parseInt(output.textContent.replace(/,|\./g, ''));
-        if (hasClickedNum) {
-            accumulator = operate(prevOperator, prevVal, currVal);
-            output.textContent = insertComma(accumulator.toString());
+        if (!hasClickedNum) {
+            accumulator = operate(prevOperator, currVal, prevVal);
         } else {
-            output.textContent = insertComma(currVal.toString());
+            accumulator = operate(prevOperator, prevVal, currVal);
         }
+
+        output.textContent = insertComma(accumulator.toString());
+    } 
+
+    console.log(`accumulator = ${accumulator}`);
+
+    // only sets the previous value if a numnber has been clicked
+    if ((!hasClickedNum || prevVal !== null) && operator !== '=' && accumulator !== null) {
+        prevVal = accumulator;
+    } else if (hasClickedNum) {
+        prevVal = currVal;
     }
+
+    console.log(`prevVal = ${prevVal}`);
+
+    // css style removal
+    removePrevOpStyle();
 
     if (operator !== '=') {
         e.currentTarget.classList.add('operatorClick'); // add click style
         prevOperator = operator;
-        prevVal = parseInt(output.textContent.replace(/,|\./g, ''));
-    } else if (operator === '=') {
-        prevOperator = '';
-    }
-
-    hasClickedNum = false;
+        hasClickedOp = true; 
+    } 
+    
+    hasClickedNum = false; // after clicking an operator 
 }
 
 // remove operatorClick style class (after a number is clicked)
@@ -143,7 +147,7 @@ function numClick(e) {
     if (outText === '0' || hasClickedOp) {
         hasClickedOp = false;
         output.textContent = numText; 
-    } else if (outText.replace(/,|\./g, '').length < 9) {
+    } else if (outText.replace(/,|\.|-/g, '').length < 9) {
         outText += numText;
         output.textContent = insertComma(outText);
     }
@@ -157,17 +161,19 @@ function allClear() {
     replaceDecimalListener();
     removePrevOpStyle();
     prevOperator = '';
-    accumulator = 0;
+    prevVal = null;
+    accumulator = null;
     hasClickedOp = false;
+    hasClickedNum = false;
 }
 
 const output = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
-let prevVal = 0; 
+let prevVal = null; 
 let prevOperator = '';
-let accumulator = 0;
+let accumulator = null;
 let hasClickedOp = false;
 let hasClickedNum = false;
 

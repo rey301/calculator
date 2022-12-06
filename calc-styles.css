@@ -16,7 +16,7 @@ body {
         display: grid;
         grid-template-columns: repeat(4, minmax(10px, 100px));
         grid-template-rows: minmax(20px, 200px) repeat(5, minmax(10px, 100px));
-        gap: 10px;
+        gap: 15px;
     }
 
     .calculator > * {
