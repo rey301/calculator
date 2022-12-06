@@ -39,9 +39,8 @@ function replaceDecimalListener() {
     const newBtn = oldBtn.cloneNode(true);
 
     newBtn.addEventListener('click', function cb(e) {
-        if (hasClickedOp || hasClickedEquals) {
+        if (hasClickedOp) {
             hasClickedOp = false;
-            hasClickedEquals = true;
             output.textContent = '0.'; 
         } else if (output.textContent.replace(/,|\./g, '').length < 9) {
             output.textContent += e.target.textContent;
@@ -123,11 +122,10 @@ function opClick(e) {
     if (operator !== '=') {
         e.currentTarget.classList.add('operatorClick'); // add click style
         prevOperator = operator;
-        hasClickedOp = true; 
-    } else {
-        hasClickedEquals = true;
-    }
-    
+        
+    } 
+
+    hasClickedOp = true; 
     hasClickedNum = false; // after clicking an operator 
 }
 
