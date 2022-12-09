@@ -18,16 +18,12 @@ function operate (operator, num1, num2) {
     switch (operator) {
         case '+':
             return add(num1, num2);
-
         case '–':
             return subtract(num1, num2);
-
         case '×':
             return multiply(num1, num2);
-
         case '÷':
             return divide(num1, num2);
-
         default: 
             return "Error: invalid operator";
     }
@@ -41,9 +37,9 @@ function replaceDecimalListener() {
     newBtn.addEventListener('click', function cb(e) {
         if (hasClickedOp) {
             hasClickedOp = false;
-            output.textContent = '0.'; 
-        } else if (output.textContent.replace(/,|\./g, '').length < 9) {
-            output.textContent += e.target.textContent;
+            outputDiv.textContent = '0.'; 
+        } else if (outputDiv.textContent.replace(/,|\./g, '').length < 9) {
+            outputDiv.textContent += e.target.textContent;
         }
         e.currentTarget.removeEventListener(e.type, cb);
     }, {once: true});
@@ -82,66 +78,59 @@ function removeOpHover(e) {
 
 // operator click function
 function opClick(e) {
-    replaceDecimalListener();
     const operator = e.currentTarget.textContent;
-    let currVal = parseFloat(output.textContent.replace(/,/g, ''));
+    let currVal = parseFloat(outputDiv.textContent.replace(/,/g, ''));
+    replaceDecimalListener(); // allow decimal button to be pressed again
+    removePrevOpStyle(); // css style removal
 
-    console.log(`currVal = ${currVal}`);
-
-    // only calculate if there is a previous operator 
-    if ((hasClickedNum || operator === '=') && prevOperator !== '') {
+    // only calculate if there is a previous operator,
+    // and has clicked a number / equals button
+    if ((hasClickedNum || operator === '=') && prevOperator !== null) {
         // calculate and add to accumulator
-        if (!hasClickedNum) {
+        hasClickedNum ? 
+            accumulator = operate(prevOperator, prevVal, currVal) : 
             accumulator = operate(prevOperator, currVal, prevVal);
-        } else {
-            accumulator = operate(prevOperator, prevVal, currVal);
-        }
 
-        if (accumulator.toString().length > 10) {
-            output.textContent = insertComma(roundNumber(accumulator, 8)
-                .toString());
-        } else {
-            output.textContent = insertComma(accumulator.toString());
-        }
+        // round the number if the length is too long to fit the output
+        accumulator.toString().length > 10 ? 
+            outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
+                .toString()) :
+            outputDiv.textContent = insertComma(accumulator.toString());
     }
-
-    console.log(`accumulator = ${accumulator}`);
 
     // only sets the previous value if a numnber has been clicked
-    if ((!hasClickedNum || prevVal !== null) && operator !== '=' && accumulator !== null) {
-        prevVal = accumulator;
+    if ((!hasClickedNum || prevVal !== null) 
+        && operator !== '=' 
+        && accumulator !== null) {
+            prevVal = accumulator;
     } else if (hasClickedNum) {
-        prevVal = currVal;
+            prevVal = currVal;
     }
-
-    console.log(`prevVal = ${prevVal}`);
-
-    // css style removal
-    removePrevOpStyle();
 
     if (operator !== '=') {
         e.currentTarget.classList.add('operatorClick'); // add click style
         prevOperator = operator;
-        
     } 
 
     hasClickedOp = true; 
-    hasClickedNum = false; // after clicking an operator 
+    hasClickedNum = false;
 }
 
-// remove operatorClick style class (after a number is clicked)
+// remove operatorClick style class (after a number/equals button is clicked)
 function removePrevOpStyle() {
-    let clickedOp;
-    if (prevOperator !== '' && prevOperator !== '=') {
-        if(prevOperator === '+'){
-            clickedOp = document.querySelector('.add');
-        } else if(prevOperator === '–'){
-            clickedOp = document.querySelector('.subtract');
-        } else if(prevOperator === '×'){
-            clickedOp = document.querySelector('.multiply');
-        } else if(prevOperator === '÷'){
-            clickedOp = document.querySelector('.divide');
-        }
+    let clickedOp = null;
+
+    if (prevOperator === '+') {
+        clickedOp = document.querySelector('.add');
+    } else if (prevOperator === '–') {
+        clickedOp = document.querySelector('.subtract');
+    } else if (prevOperator === '×') {
+        clickedOp = document.querySelector('.multiply');
+    } else if (prevOperator === '÷') {
+        clickedOp = document.querySelector('.divide');
+    }
+
+    if (clickedOp !== null) {
         clickedOp.classList.remove('operatorClick');
     }
 }
@@ -149,17 +138,17 @@ function removePrevOpStyle() {
 // number click function
 function numClick(e) {
     const numText = e.target.textContent;
-    let outText = output.textContent;
+    let outText = outputDiv.textContent;
     hasClickedNum = true;
 
     // if the output text is 0 or an operator has been clicked, 
     // then replace the output, otherwise append to it
     if (outText === '0' || hasClickedOp) {
         hasClickedOp = false;
-        output.textContent = numText; 
+        outputDiv.textContent = numText; 
     } else if (outText.replace(/,|\.|-/g, '').length < 9) {
         outText += numText;
-        output.textContent = insertComma(outText);
+        outputDiv.textContent = insertComma(outText);
     }
 
     removePrevOpStyle();
@@ -177,32 +166,28 @@ function allClear() {
     hasClickedNum = false;
 }
 
+// round number by the number of digits
 function roundNumber(number, digits) {
     var multiple = Math.pow(10, digits);
-    var rndedNum = Math.round(number * multiple) / multiple;
-    return rndedNum;
+    var roundNum = Math.round(number * multiple) / multiple;
+    return roundNum;
 }
 
-const output = document.querySelector('.output');
+const outputDiv = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
 let prevVal = null; 
-let prevOperator = '';
+let prevOperator = null;
 let accumulator = null;
 let hasClickedOp = false;
 let hasClickedNum = false;
-let hasClickedEquals = false;
 
-replaceDecimalListener();
-
-// clear button event listener
-clearBtn.addEventListener('click', allClear);
+replaceDecimalListener(); // adds click function to decimal button
+clearBtn.addEventListener('click', allClear); // clear button event listener
 
 // number event listeners
-numBtns.forEach(numBtn => {
-    numBtn.addEventListener('click', numClick);
-});
+numBtns.forEach(numBtn => numBtn.addEventListener('click', numClick));
 
 // operator event listeners
 opBtns.forEach(opBtn => { 
