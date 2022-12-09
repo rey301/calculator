@@ -11,7 +11,11 @@ function multiply(num1, num2) {
 }
 
 function divide(num1, num2) {
-    return num1 / num2;
+    if (num2 == 0) {
+        return divideByZero = true;
+    } else {
+        return num1 / num2;
+    }
 }
 
 function operate (operator, num1, num2) {
@@ -91,8 +95,10 @@ function opClick(e) {
             accumulator = operate(prevOperator, prevVal, currVal) : 
             accumulator = operate(prevOperator, currVal, prevVal);
 
-        // round the number if the length is too long to fit the output
-        accumulator.toString().length > 10 ? 
+        divideByZero ?
+            outputDiv.textContent = 'Error' :
+            // round the number if the length is too long to fit the output
+            accumulator.toString().length > 10 ? 
             outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
                 .toString()) :
             outputDiv.textContent = insertComma(accumulator.toString());
@@ -164,6 +170,7 @@ function allClear() {
     accumulator = null;
     hasClickedOp = false;
     hasClickedNum = false;
+    divideByZero = false;
 }
 
 // round number by the number of digits
@@ -182,6 +189,7 @@ let prevOperator = null;
 let accumulator = null;
 let hasClickedOp = false;
 let hasClickedNum = false;
+let divideByZero = false;
 
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
