@@ -99,9 +99,9 @@ function opClick(e) {
             outputDiv.textContent = 'Error' :
             // round the number if the length is too long to fit the output
             accumulator.toString().length > 10 ? 
-            outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
-                .toString()) :
-            outputDiv.textContent = insertComma(accumulator.toString());
+                outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
+                    .toString()) :
+                outputDiv.textContent = insertComma(accumulator.toString());
     }
 
     // only sets the previous value if a numnber has been clicked
@@ -165,7 +165,7 @@ function allClear() {
     document.querySelector('.output').textContent = 0;
     replaceDecimalListener();
     removePrevOpStyle();
-    prevOperator = '';
+    prevOperator = null;
     prevVal = null;
     accumulator = null;
     hasClickedOp = false;
