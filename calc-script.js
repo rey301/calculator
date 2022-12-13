@@ -53,7 +53,7 @@ function replaceDecimalListener() {
 
 // inserts comma for every third character
 function insertComma(outText) {
-    if (!outText.includes('.')) {
+    if (!outText.includes('.') && !outText.includes('e')) {
         outText = outText.replace(/,/g, '');
         if (outText.replace(/-/g, '').length > 3 && 
             outText.replace(/-/g, '').length <= 6) {
@@ -160,6 +160,39 @@ function numClick(e) {
     removePrevOpStyle();
 }
 
+function percClick(e) {
+    let percValString = '';
+
+    if (!hasClickedPerc) {
+        hasClickedPerc = true;
+        percVal = parseFloat(outputDiv.textContent.replace(/,/g, ''));
+    }
+
+    if (!percLimit) {
+        percVal = percVal / 100;
+        const percValSplit = percVal.toString().split('e');
+
+        if (percVal.toString().includes('e')) {
+            percValSplit[0].length > 10 ?
+                percValString = `${roundNumber(parseFloat(percValSplit[0]), 8)}`
+                    + `e${parseFloat(percValSplit[1])}` :
+                percValString = `${parseFloat(percValSplit[0])}`
+                    + `e${parseFloat(percValSplit[1])}`;
+        } else if (percVal.toString().length > 10) {
+            percValString = roundNumber(percVal, 8).toString();
+        } else {
+            percValString = percVal.toString();
+        }
+
+        if (percValSplit[1] < -100) {
+            outputDiv.textContent = 'Error';
+            percLimit = true;
+        } else { 
+            outputDiv.textContent = insertComma(percValString);
+        }
+    }
+}
+
 // reset calculator
 function allClear() {
     document.querySelector('.output').textContent = 0;
@@ -168,9 +201,13 @@ function allClear() {
     prevOperator = null;
     prevVal = null;
     accumulator = null;
+    originPercVal = null;
+    percVal = null;
+    hasClickedPerc = false;
     hasClickedOp = false;
     hasClickedNum = false;
     divideByZero = false;
+    percLimit = false;
 }
 
 // round number by the number of digits
@@ -182,17 +219,23 @@ function roundNumber(number, digits) {
 
 const outputDiv = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
+const percBtn = document.querySelector('.percentage');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
 let prevVal = null; 
 let prevOperator = null;
 let accumulator = null;
+let originPercVal = null;
+let percVal = null;
+let hasClickedPerc = false;
 let hasClickedOp = false;
 let hasClickedNum = false;
 let divideByZero = false;
+let percLimit = false;
 
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
+percBtn.addEventListener('click', percClick);
 
 // number event listeners
 numBtns.forEach(numBtn => numBtn.addEventListener('click', numClick));
