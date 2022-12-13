@@ -53,7 +53,15 @@ function replaceDecimalListener() {
 
 // inserts comma for every third character
 function insertComma(outText) {
-    if (!outText.includes('.') && !outText.includes('e')) {
+    let isDecimal = false;
+
+    if (outText.includes('.')) {
+        isDecimal = true;
+        outTextSplit = outText.split('.');
+        outText = outTextSplit[0];
+    }
+
+    if (!outText.includes('e')) {
         outText = outText.replace(/,/g, '');
         if (outText.replace(/-/g, '').length > 3 && 
             outText.replace(/-/g, '').length <= 6) {
@@ -68,7 +76,8 @@ function insertComma(outText) {
                 outText.slice(outText.length - 3);
         }
     }
-    return outText;
+
+    return isDecimal ? `${outText}.${outTextSplit[1]}` : outText;
 }
 
 // add style class for hovering over operator buttons
@@ -98,6 +107,7 @@ function opClick(e) {
         divideByZero ?
             outputDiv.textContent = 'Error' :
             // round the number if the length is too long to fit the output
+            console.log(accumulator.toString().length);
             accumulator.toString().length > 10 ? 
                 outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
                     .toString()) :
@@ -149,12 +159,15 @@ function numClick(e) {
 
     // if the output text is 0 or an operator has been clicked, 
     // then replace the output, otherwise append to it
-    if (outText === '0' || hasClickedOp) {
+    if (outText === '0' || hasClickedOp || hasClickedPerc) {
         hasClickedOp = false;
+        hasClickedPerc = false;
         outputDiv.textContent = numText; 
     } else if (outText.replace(/,|\.|-/g, '').length < 9) {
         outText += numText;
         outputDiv.textContent = insertComma(outText);
+    } else {
+        hasClickedNum = false;
     }
 
     removePrevOpStyle();
@@ -173,8 +186,8 @@ function percClick(e) {
         const percValSplit = percVal.toString().split('e');
 
         if (percVal.toString().includes('e')) {
-            percValSplit[0].length > 10 ?
-                percValString = `${roundNumber(parseFloat(percValSplit[0]), 8)}`
+            percValSplit[0].length > 9 ?
+                percValString = `${roundNumber(parseFloat(percValSplit[0]), 7)}`
                     + `e${parseFloat(percValSplit[1])}` :
                 percValString = `${parseFloat(percValSplit[0])}`
                     + `e${parseFloat(percValSplit[1])}`;
