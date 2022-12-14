@@ -98,20 +98,53 @@ function opClick(e) {
 
     // only calculate if there is a previous operator,
     // and has clicked a number / equals button
-    if ((hasClickedNum || operator === '=') && prevOperator !== null) {
+    if ((hasClickedNum || operator === '=') && prevOperator !== null 
+    && !smallLimit) {
         // calculate and add to accumulator
         hasClickedNum ? 
             accumulator = operate(prevOperator, prevVal, currVal) : 
             accumulator = operate(prevOperator, currVal, prevVal);
 
-        divideByZero ?
-            outputDiv.textContent = 'Error' :
-            // round the number if the length is too long to fit the output
-            console.log(accumulator.toString().length);
-            accumulator.toString().length > 10 ? 
-                outputDiv.textContent = insertComma(roundNumber(accumulator, 8)
-                    .toString()) :
-                outputDiv.textContent = insertComma(accumulator.toString());
+        if (divideByZero) {
+            outputDiv.textContent = 'Error';
+        // round the number if the length is too long to fit the output
+        } else if (accumulator.toString().length > 9
+        && accumulator > 999999999) {
+            const accExp = accumulator.toExponential();
+            const accumulatorSplit = accExp
+                .toString()
+                .split('e');
+
+            accExp.toString().length > 9 ?
+                outputDiv.textContent = 
+                    `${roundNumber(parseFloat(accumulatorSplit[0]), 
+                        8 - accumulatorSplit[1].length)}` + 
+                    `e${parseFloat(accumulatorSplit[1])}` :
+                outputDiv.textContent =`${parseFloat(accumulatorSplit[0])}` + 
+                `e${parseFloat(accumulatorSplit[1])}`;
+        
+        } else if (accumulator.toString().includes('e')) {
+            handlerArr = smallNumHandler(accumulator, smallLimit);
+            outputDiv.textContent = handlerArr[0];
+            smallLimit = handlerArr[1];
+        } else if (accumulator.toString().length > 10 
+        && accumulator.toString().includes('.')) {
+            console.log(accumulator);
+            if (accumulator.toString().split('.')[0].length > 8) {
+                outputDiv.textContent = insertComma(Math.round(accumulator)
+                    .toString());
+            } else {
+                outputDiv.textContent = 
+                    insertComma(roundNumber(accumulator, 
+                        accumulator.toString().split('.')[1].length - 
+                        (accumulator.toString().length - 10))
+                    .toString());
+            }
+        } else {
+            outputDiv.textContent = insertComma(accumulator.toString());
+        }        
+    } else if (smallLimit) {
+        outputDiv.textContent = 'Error';
     }
 
     // only sets the previous value if a numnber has been clicked
@@ -166,44 +199,52 @@ function numClick(e) {
     } else if (outText.replace(/,|\.|-/g, '').length < 9) {
         outText += numText;
         outputDiv.textContent = insertComma(outText);
-    } else {
-        hasClickedNum = false;
-    }
+    } 
 
     removePrevOpStyle();
 }
 
 function percClick(e) {
-    let percValString = '';
-
     if (!hasClickedPerc) {
         hasClickedPerc = true;
         percVal = parseFloat(outputDiv.textContent.replace(/,/g, ''));
     }
 
-    if (!percLimit) {
+    if (!smallLimit) {
         percVal = percVal / 100;
-        const percValSplit = percVal.toString().split('e');
-
-        if (percVal.toString().includes('e')) {
-            percValSplit[0].length > 9 ?
-                percValString = `${roundNumber(parseFloat(percValSplit[0]), 7)}`
-                    + `e${parseFloat(percValSplit[1])}` :
-                percValString = `${parseFloat(percValSplit[0])}`
-                    + `e${parseFloat(percValSplit[1])}`;
-        } else if (percVal.toString().length > 10) {
-            percValString = roundNumber(percVal, 8).toString();
-        } else {
-            percValString = percVal.toString();
-        }
-
-        if (percValSplit[1] < -100) {
-            outputDiv.textContent = 'Error';
-            percLimit = true;
-        } else { 
-            outputDiv.textContent = insertComma(percValString);
-        }
+        handlerArr = smallNumHandler(percVal, smallLimit);
+        smallLimit = handlerArr[1];
+        outputDiv.textContent = handlerArr[0];
     }
+}
+
+function smallNumHandler(num, limit) {
+    let outputString = '';
+    const numSplit = num.toString().split('e');
+
+    if (num.toString().includes('e')) {
+        // Round the number if the length is bigger than 9
+        num.toString().length > 11 ?
+            outputString = `${roundNumber(parseFloat(numSplit[0]), 
+                    (9 - numSplit[1].length) - 1)}`
+                + `e${parseFloat(numSplit[1])}` :
+            outputString = `${parseFloat(numSplit[0])}`
+                + `e${parseFloat(numSplit[1])}`;
+
+    } else if (num.toString().length > 10) {
+        outputString = roundNumber(num, 8).toString();
+    } else {
+        outputString = num.toString();
+    }
+
+    if (numSplit[1] < -100) {
+        outputString = 'Error';
+        limit = true;
+    } else { 
+        outputString = insertComma(outputString);
+    }
+
+    return [outputString, limit];
 }
 
 // reset calculator
@@ -220,7 +261,7 @@ function allClear() {
     hasClickedOp = false;
     hasClickedNum = false;
     divideByZero = false;
-    percLimit = false;
+    smallLimit = false;
 }
 
 // round number by the number of digits
@@ -238,13 +279,12 @@ const opBtns = document.querySelectorAll('.operator');
 let prevVal = null; 
 let prevOperator = null;
 let accumulator = null;
-let originPercVal = null;
 let percVal = null;
 let hasClickedPerc = false;
 let hasClickedOp = false;
 let hasClickedNum = false;
 let divideByZero = false;
-let percLimit = false;
+let smallLimit = false;
 
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
