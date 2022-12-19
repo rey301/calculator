@@ -278,6 +278,7 @@ function roundNumber(number, digits) {
 const outputDiv = document.querySelector('.output');
 const clearBtn = document.querySelector('.clear');
 const percBtn = document.querySelector('.percentage');
+const signBtn = document.querySelector('.sign');
 const numBtns = document.querySelectorAll('.number');
 const opBtns = document.querySelectorAll('.operator');
 let prevVal = null; 
@@ -293,7 +294,16 @@ let largeLimit = false;
 
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
-percBtn.addEventListener('click', percClick);
+percBtn.addEventListener('click', percClick); // percent button event listener
+signBtn.addEventListener('click', e => {
+    if (outputDiv.textContent !== '0') {
+        if (outputDiv.textContent.includes('-')) {
+            outputDiv.textContent = outputDiv.textContent.split('-')[1];
+        } else {
+            outputDiv.textContent = `-${outputDiv.textContent}`;
+        }
+    }
+});
 
 // number event listeners
 numBtns.forEach(numBtn => numBtn.addEventListener('click', numClick));
