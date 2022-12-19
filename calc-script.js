@@ -33,7 +33,7 @@ function operate (operator, num1, num2) {
     }
 }
 
-// replace decimal event listener; so that it can only be clicked once
+// Replace decimal event listener; so that it can only be clicked once
 function replaceDecimalListener() {
     const oldBtn = document.querySelector('.decimal');
     const newBtn = oldBtn.cloneNode(true);
@@ -51,7 +51,7 @@ function replaceDecimalListener() {
     oldBtn.parentNode.replaceChild(newBtn, oldBtn);
 }
 
-// inserts comma for every third character
+// Inserts comma for every third character
 function insertComma(outText) {
     let isDecimal = false;
 
@@ -80,27 +80,27 @@ function insertComma(outText) {
     return isDecimal ? `${outText}.${outTextSplit[1]}` : outText;
 }
 
-// add style class for hovering over operator buttons
+// Add style class for hovering over operator buttons
 function addOpHover(e) {
     return e.currentTarget.classList.add('operatorHover');
 }
-// remove style class for hovering over operator buttons
+// Remove style class for hovering over operator buttons
 function removeOpHover(e) {
     return e.currentTarget.classList.remove('operatorHover');
 }
 
-// operator click function
+// Operator click function
 function opClick(e) {
     const operator = e.currentTarget.textContent;
     let currVal = parseFloat(outputDiv.textContent.replace(/,/g, ''));
     replaceDecimalListener(); // allow decimal button to be pressed again
     removePrevOpStyle(); // css style removal
 
-    // only calculate if there is a previous operator,
+    // Only calculate if there was a previous operator,
     // and has clicked a number / equals button
     if ((hasClickedNum || operator === '=') && prevOperator !== null 
     && !smallLimit) {
-        // calculate and add to accumulator
+        // Calculate and add to accumulator
         hasClickedNum ? 
             accumulator = operate(prevOperator, prevVal, currVal) : 
             accumulator = operate(prevOperator, currVal, prevVal);
@@ -111,14 +111,15 @@ function opClick(e) {
 
         if (divideByZero || smallLimit || largeLimit) {
             outputDiv.textContent = 'Error';
-        // round the number if the length is too long to fit the output
         } else if (accumulator.toString().length > 9
         && accumulator > 999999999) {
+            // Handles very large numbers
             const accExp = accumulator.toExponential();
             const accumulatorSplit = accExp
                 .toString()
                 .split('e');
 
+            // Round the number if the length is too long to fit the output
             accExp.toString().length > 9 ?
                 outputDiv.textContent = 
                     `${roundNumber(parseFloat(accumulatorSplit[0]), 
@@ -126,36 +127,35 @@ function opClick(e) {
                     `e${parseFloat(accumulatorSplit[1])}` :
                 outputDiv.textContent =`${parseFloat(accumulatorSplit[0])}` + 
                 `e${parseFloat(accumulatorSplit[1])}`;
-        
+
         } else if (accumulator.toString().includes('e')) {
-            handlerArr = smallNumHandler(accumulator, smallLimit);
+            // Handles very small numbers
+            handlerArr = smallNumHandler(accumulator, smallLimit); 
             outputDiv.textContent = handlerArr[0];
             smallLimit = handlerArr[1];
         } else if (accumulator.toString().length > 10 
         && accumulator.toString().includes('.')) {
-            console.log(accumulator);
-            if (accumulator.toString().split('.')[0].length > 8) {
+
+            // Round to the nearest whole integer if the length is too long
+            accumulator.toString().split('.')[0].length > 8 ?
                 outputDiv.textContent = insertComma(Math.round(accumulator)
-                    .toString());
-            } else {
+                    .toString()) :
                 outputDiv.textContent = 
                     insertComma(roundNumber(accumulator, 
                         accumulator.toString().split('.')[1].length - 
                         (accumulator.toString().length - 10))
                     .toString());
-            }
+
         } else {
             outputDiv.textContent = insertComma(accumulator.toString());
         }        
     }
 
-    // only sets the previous value if a numnber has been clicked
-    if ((!hasClickedNum || prevVal !== null) 
-        && operator !== '=' 
-        && accumulator !== null) {
-            prevVal = accumulator;
+    if ((!hasClickedNum || prevVal !== null) && operator !== '=' 
+    && accumulator !== null) {
+        prevVal = accumulator;
     } else if (hasClickedNum) {
-            prevVal = currVal;
+        prevVal = currVal;
     }
 
     if (operator !== '=') {
@@ -167,7 +167,7 @@ function opClick(e) {
     hasClickedNum = false;
 }
 
-// remove operatorClick style class (after a number/equals button is clicked)
+// Remove operatorClick style class (after a number/equals button is clicked)
 function removePrevOpStyle() {
     let clickedOp = null;
 
@@ -179,21 +179,20 @@ function removePrevOpStyle() {
         clickedOp = document.querySelector('.multiply');
     } else if (prevOperator === '÷') {
         clickedOp = document.querySelector('.divide');
-    }
+    } 
 
     if (clickedOp !== null) {
         clickedOp.classList.remove('operatorClick');
     }
 }
 
-// number click function
+// Number click function
 function numClick(e) {
     const numText = e.target.textContent;
     let outText = outputDiv.textContent;
     hasClickedNum = true;
 
-    // if the output text is 0 or an operator has been clicked, 
-    // then replace the output, otherwise append to it
+    // Replace the output or append to it
     if (outText === '0' || hasClickedOp || hasClickedPerc) {
         hasClickedOp = false;
         hasClickedPerc = false;
@@ -206,7 +205,8 @@ function numClick(e) {
     removePrevOpStyle();
 }
 
-function percClick(e) {
+// Percentage button click function
+function percClick() {
     if (!hasClickedPerc) {
         hasClickedPerc = true;
         percVal = parseFloat(outputDiv.textContent.replace(/,/g, ''));
@@ -214,9 +214,22 @@ function percClick(e) {
 
     if (!smallLimit) {
         percVal = percVal / 100;
+        
+        // Handles very small numbers
         handlerArr = smallNumHandler(percVal, smallLimit);
         smallLimit = handlerArr[1];
         outputDiv.textContent = handlerArr[0];
+    }
+}
+
+// Sign button click function
+function signClick() {
+    if (outputDiv.textContent !== '0') {
+        if (outputDiv.textContent.includes('-')) {
+            outputDiv.textContent = outputDiv.textContent.split('-')[1];
+        } else {
+            outputDiv.textContent = `-${outputDiv.textContent}`;
+        }
     }
 }
 
@@ -250,7 +263,7 @@ function smallNumHandler(num, limit) {
     return [outputString, limit];
 }
 
-// reset calculator
+// Reset calculator
 function allClear() {
     document.querySelector('.output').textContent = 0;
     replaceDecimalListener();
@@ -268,7 +281,7 @@ function allClear() {
     largeLimit = false;
 }
 
-// round number by the number of digits
+// Round number by the number of digits
 function roundNumber(number, digits) {
     var multiple = Math.pow(10, digits);
     var roundNum = Math.round(number * multiple) / multiple;
@@ -295,20 +308,12 @@ let largeLimit = false;
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
 percBtn.addEventListener('click', percClick); // percent button event listener
-signBtn.addEventListener('click', e => {
-    if (outputDiv.textContent !== '0') {
-        if (outputDiv.textContent.includes('-')) {
-            outputDiv.textContent = outputDiv.textContent.split('-')[1];
-        } else {
-            outputDiv.textContent = `-${outputDiv.textContent}`;
-        }
-    }
-});
+signBtn.addEventListener('click', signClick); // sign button event listener
 
-// number event listeners
+// Number event listeners
 numBtns.forEach(numBtn => numBtn.addEventListener('click', numClick));
 
-// operator event listeners
+// Operator event listeners
 opBtns.forEach(opBtn => { 
     opBtn.addEventListener('mouseover', addOpHover);
     opBtn.addEventListener('mouseleave', removeOpHover);
