@@ -105,7 +105,11 @@ function opClick(e) {
             accumulator = operate(prevOperator, prevVal, currVal) : 
             accumulator = operate(prevOperator, currVal, prevVal);
 
-        if (divideByZero) {
+        if (accumulator === Infinity && !largeLimit) {
+            largeLimit = true;
+        }
+
+        if (divideByZero || smallLimit || largeLimit) {
             outputDiv.textContent = 'Error';
         // round the number if the length is too long to fit the output
         } else if (accumulator.toString().length > 9
@@ -143,8 +147,6 @@ function opClick(e) {
         } else {
             outputDiv.textContent = insertComma(accumulator.toString());
         }        
-    } else if (smallLimit) {
-        outputDiv.textContent = 'Error';
     }
 
     // only sets the previous value if a numnber has been clicked
@@ -218,12 +220,13 @@ function percClick(e) {
     }
 }
 
+// Reduces the length of small numbers to fit the calculator output
 function smallNumHandler(num, limit) {
     let outputString = '';
     const numSplit = num.toString().split('e');
 
     if (num.toString().includes('e')) {
-        // Round the number if the length is bigger than 9
+        // Round the number if the length is bigger than 11
         num.toString().length > 11 ?
             outputString = `${roundNumber(parseFloat(numSplit[0]), 
                     (9 - numSplit[1].length) - 1)}`
@@ -262,6 +265,7 @@ function allClear() {
     hasClickedNum = false;
     divideByZero = false;
     smallLimit = false;
+    largeLimit = false;
 }
 
 // round number by the number of digits
@@ -285,6 +289,7 @@ let hasClickedOp = false;
 let hasClickedNum = false;
 let divideByZero = false;
 let smallLimit = false;
+let largeLimit = false;
 
 replaceDecimalListener(); // adds click function to decimal button
 clearBtn.addEventListener('click', allClear); // clear button event listener
